@@ -18,7 +18,7 @@ class TaskController extends Controller
         if ($tasks==NULL){
             return response()->json(['error'=>'empty data']);
         }
-        return $tasks;
+        return response()->json($tasks);
     }
 
     public function read($id){
@@ -27,7 +27,7 @@ class TaskController extends Controller
         if ($task==NULL){
             return response()->json(['error'=>'empty data']);
         }
-        return $task;
+        return response()->json($task);
     }
     public function create(Request $request){
         $this->valid($request);
