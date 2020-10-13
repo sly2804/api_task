@@ -7,14 +7,20 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    
+    private $allowField=[
+                'id',
+                'name',
+                'mail',
+                'task',
+                'done'];
+
     public function __construct()
     {
         //
     }
 
     public function read_all(){
-        $tasks=Task::select('id','name','mail','task','done')->simplePaginate(3);
+        $tasks=Task::select($this->allowField)->Paginate(3);
         if ($tasks==NULL){
             return response()->json(['error'=>'empty data']);
         }
@@ -23,7 +29,7 @@ class TaskController extends Controller
 
     public function read($id){
         $this->validId($id);
-        $task=Task::select('id','name','mail','task','done')->where('id', '=', $id)->first();
+        $task=Task::select($this->allowField)->where('id', '=', $id)->first();
         if ($task==NULL){
             return response()->json(['error'=>'empty data']);
         }
