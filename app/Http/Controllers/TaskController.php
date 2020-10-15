@@ -77,7 +77,7 @@ class TaskController extends Controller
             'task' => 'required|max:100',
             'done' => "required|boolean"
         ]);
-        return 0;
+        return 1;
     }
     private function validId($id){
         if (!is_numeric($id)){
