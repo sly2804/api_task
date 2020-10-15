@@ -81,8 +81,6 @@ class TaskController extends Controller
             return response()->json(['error'=>'id must be numeric'])->setStatusCode(400);
         }
         return 1;
-
-        //return 1;
     }
     private function makeNewData (Request $request){
         $newData=[
