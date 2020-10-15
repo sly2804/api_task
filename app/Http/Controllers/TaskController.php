@@ -25,7 +25,8 @@ class TaskController extends Controller
     }
 
     public function read($id){
-        $this->validId($id);
+        $validate = $this->validId($id);
+        if ($validate){return $validate;}
         $task=Task::select($this->allowField)->where('id', '=', $id)->first();
         if ($task==NULL){
             return response()->json(['status'=>'not found'])->setStatusCode(404);
@@ -44,7 +45,8 @@ class TaskController extends Controller
         return response()->json(['status' => 'Task created', 'id'=>$task->id])->setStatusCode(201);
     }
     public function modify(Request $request, $id){
-        $this->validId($id);
+        $validate = $this->validId($id);
+        if ($validate){return $validate;}
         $this->valid($request);
         $modifyData=$this->makeNewData($request);
         $task=Task::where('id','=',$id)->first();
@@ -60,7 +62,8 @@ class TaskController extends Controller
         return response()->json(['status' => 'Task modified', 'id'=>$task->id])->setStatusCode(200);
     }
     public function delete($id){
-        $this->validId($id);
+        $validate = $this->validId($id);
+        if ($validate){return $validate;}
         $task=Task::destroy($id);
         if ($task==NULL){
             return response()->json(['error'=>'empty data! no data for delete'])->setStatusCode(404);
@@ -80,7 +83,7 @@ class TaskController extends Controller
         if (!is_numeric($id)){
             return response()->json(['error'=>'id must be numeric'])->setStatusCode(400);
         }
-        return 1;
+        return 0;
     }
     private function makeNewData (Request $request){
         $newData=[
