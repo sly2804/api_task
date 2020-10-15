@@ -17,7 +17,7 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-	$router->get('/api/task','TaskController@read_all');
+	$router->get('/api/task','TaskController@readAll');
 	$router->get('/api/task/{id}','TaskController@read');
 	$router->post('/api/task/',['uses' =>'TaskController@create']);
 	$router->put('/api/task/{id}','TaskController@modify');

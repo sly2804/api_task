@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+    private $perPage = 3;
     private $allowField=[
                 'id',
                 'name',
@@ -19,11 +20,8 @@ class TaskController extends Controller
         //
     }
 
-    public function read_all(){
-        $tasks=Task::select($this->allowField)->Paginate(3);
-        if ($tasks==NULL){
-            return response()->json(['error'=>'empty data']);
-        }
+    public function readAll(){
+        $tasks=Task::select($this->allowField)->Paginate($this->perPage);
         return response()->json($tasks);
     }
 
@@ -31,50 +29,44 @@ class TaskController extends Controller
         $this->validId($id);
         $task=Task::select($this->allowField)->where('id', '=', $id)->first();
         if ($task==NULL){
-            return response()->json(['error'=>'empty data']);
+            return response()->json(['status'=>'not found'])->setStatusCode(404);
         }
-        return response()->json($task);
+        return response()->json($task)->setStatusCode(200);
     }
     public function create(Request $request){
         $this->valid($request);
-        $task= new Task;
-        $task->name = $request->input('name');
-        $task->mail = $request->input('mail');
-        $task->task = $request->input('task');
-        $task->done = $request->input('done');
+        $newData=$this->makeNewData($request);
+        $task= new Task($newData);
         try {
             $task->save();
         } catch (Exeption $e){
-            return response()->json(['status' => 'Task not created','error'=>$e]);
+            return response()->json(['status' => 'Task not created','error'=>$e])->setStatusCode(500);
         }
-        return response()->json(['status' => 'Task created']);
+        return response()->json(['status' => 'Task created', 'id'=>$task->id])->setStatusCode(201);
     }
     public function modify(Request $request, $id){
         $this->validId($id);
         $this->valid($request);
-
+        $modifyData=$this->makeNewData($request);
         $task=Task::where('id','=',$id)->first();
         if ($task==NULL){
-            return response()->json(['error'=>'empty modify data']);
+            return response()->json(['error'=>'empty modify data'])->setStatusCode(404);
         }
-        $task->name = $request->input('name');
-        $task->mail = $request->input('mail');
-        $task->task = $request->input('task');
-        $task->done = $request->input('done');
+
         try {
-            $task->save();
+            $task->update($modifyData);
         } catch (Exeption $e){
-            return response()->json(['status' => 'Task not created','error'=>$e]);
+            return response()->json(['status' => 'Task not modified','error'=>$e])->setStatusCode(500);
         }
-        return response()->json(['status' => 'Task modified', 'id'=>$id]);
+        return response()->json(['status' => 'Task modified', 'id'=>$task->id])->setStatusCode(200);
     }
     public function delete($id){
         $this->validId($id);
         $task=Task::destroy($id);
         if ($task==NULL){
-            return response()->json(['error'=>'empty data! no data for delete']);
+            return response()->json(['error'=>'empty data! no data for delete'])->setStatusCode(404);
         }
-        return response()->json(['status'=>'deleted']);
+        return response()->json(['status'=>'deleted'])->setStatusCode(200);
     }
     private function valid(Request $request){
         $this->validate($request, [
@@ -89,6 +81,15 @@ class TaskController extends Controller
             return response()->json(['error'=>'id must be numeric']);
         }
         return 1;
+    }
+    private function makeNewData (Request $request){
+        $newData=[
+            'name'=>$request->input('name'),
+            'mail'=>$request->input('mail'),
+            'task'=>$request->input('task'),
+            'done'=>$request->input('done')
+        ];
+        return $newData;
     }
     //
 };
