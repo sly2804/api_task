@@ -19,7 +19,6 @@ class TaskController extends Controller
     {
         //
     }
-
     public function readAll(){
         $tasks=Task::select($this->allowField)->Paginate($this->perPage);
         return response()->json($tasks);
@@ -75,12 +74,15 @@ class TaskController extends Controller
             'task' => 'required|max:100',
             'done' => "required|boolean"
         ]);
+        return 1;
     }
     private function validId($id){
         if (!is_numeric($id)){
-            return response()->json(['error'=>'id must be numeric']);
+            return response()->json(['error'=>'id must be numeric'])->setStatusCode(400);
         }
         return 1;
+
+        //return 1;
     }
     private function makeNewData (Request $request){
         $newData=[
