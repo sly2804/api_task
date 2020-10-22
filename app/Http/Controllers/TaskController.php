@@ -2,18 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Task;
+use App\Models\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
     private $perPage = 3;
-    private $allowField = [
-        'id',
-        'name',
-        'mail',
-        'task',
-        'done'];
     
     public function __construct()
     {
@@ -22,7 +16,7 @@ class TaskController extends Controller
     
     public function readAll()
     {
-        $tasks = Task::select($this->allowField)->Paginate($this->perPage);
+        $tasks = Task::Paginate($this->perPage);
         return response()->json($tasks);
     }
     
@@ -32,7 +26,7 @@ class TaskController extends Controller
         if ($validate) {
             return $validate;
         }
-        $task = Task::select($this->allowField)->where('id', '=', $id)->first();
+        $task = Task::find($id);
         if ($task == NULL) {
             return response()->json(['status' => 'not found'])->setStatusCode(404);
         }
@@ -60,11 +54,10 @@ class TaskController extends Controller
         }
         $this->valid($request);
         $modifyData = $this->makeNewData($request);
-        $task = Task::where('id', '=', $id)->first();
+        $task = Task::find($id);
         if ($task == NULL) {
             return response()->json(['error' => 'empty modify data'])->setStatusCode(404);
         }
-        
         try {
             $task->update($modifyData);
         } catch (Exeption $e) {
@@ -117,4 +110,5 @@ class TaskController extends Controller
     }
     //
 }
+
 ;
